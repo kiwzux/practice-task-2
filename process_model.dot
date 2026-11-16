@@ -1,0 +1,60 @@
+digraph G {
+rankdir=TB; fontname="DejaVu Sans"; nodesep=0.3; ranksep=0.16;
+node [fontname="DejaVu Sans" fontsize=11]; edge [fontname="DejaVu Sans" fontsize=9];
+label=<<B>Восстановленный процесс «Заявка на закупку»</B><BR/>1000 экземпляров, TemplateVersion 1<BR/><FONT POINT-SIZE="9">Порог 150 000 — гипотеза, согласующаяся с журналом</FONT>>; labelloc=t; fontsize=15;
+start [shape=circle label="" width=0.35 style=filled fillcolor="#c8e6c9"];
+R  [shape=box style="rounded,filled" fillcolor="#eeeeee" label=<<B>Регистрация заявки</B><BR/><FONT POINT-SIZE="9">system, process_started</FONT><BR/><FONT POINT-SIZE="9">1000 экз. (100%)</FONT>>];
+J1 [shape=diamond label="X" width=0.3 height=0.3 fixedsize=true style=filled fillcolor="#fff3cd" xlabel="слияние"];
+C [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Первичная проверка</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">specialist</FONT><BR/><FONT POINT-SIZE='9'>1174 событий в 1000 экз.</FONT>>];
+G1 [shape=diamond label="X" width=0.3 height=0.3 fixedsize=true style=filled fillcolor="#fff3cd" xlabel="Result"];
+M [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Согласование руководителем</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">manager</FONT><BR/><FONT POINT-SIZE='9'>1129 событий в 955 экз.</FONT>>];
+G2 [shape=diamond label="X" width=0.3 height=0.3 fixedsize=true style=filled fillcolor="#fff3cd" xlabel="Result"];
+D [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Доработка заявки</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">requester</FONT><BR/><FONT POINT-SIZE='9'>174 событий в 156 экз.</FONT>>];
+B [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Проверка бюджета</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">finance</FONT><BR/><FONT POINT-SIZE='9'>911 экз. (91%)</FONT>>];
+G3 [shape=diamond label="X" width=0.3 height=0.3 fixedsize=true style=filled fillcolor="#fff3cd" xlabel="Amount"];
+X [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Дополнительное согласование</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">director</FONT><BR/><FONT POINT-SIZE='9'>209 экз. (21%)</FONT>>];
+J3 [shape=diamond label="X" width=0.3 height=0.3 fixedsize=true style=filled fillcolor="#fff3cd"];
+P [shape=box style="rounded,filled" fillcolor="#e8f0fe" label=<<B>Исполнение закупки</B><BR/><FONT POINT-SIZE="9" COLOR="#555555">procurement</FONT><BR/><FONT POINT-SIZE='9'>911 экз. (91%)</FONT>>];
+Eok  [shape=box style="rounded,filled" fillcolor="#c8e6c9" label=<<B>Заявка выполнена</B><BR/><FONT POINT-SIZE="9">system, fulfilled</FONT><BR/><FONT POINT-SIZE="9">911 экз. (91.1%)</FONT>>];
+Erej [shape=box style="rounded,filled" fillcolor="#f8d7da" label=<<B>Заявка отклонена</B><BR/><FONT POINT-SIZE="9">system, rejected</FONT><BR/><FONT POINT-SIZE="9">63 экз. (6.3%)</FONT>>];
+Ecan [shape=box style="rounded,filled" fillcolor="#ffe0b2" label=<<B>Заявка отменена</B><BR/><FONT POINT-SIZE="9">system, cancelled</FONT><BR/><FONT POINT-SIZE="9">26 экз. (2.6%)</FONT>>];
+end1 [shape=doublecircle label="" width=0.25 style=filled fillcolor="#333333"];
+end2 [shape=doublecircle label="" width=0.25 style=filled fillcolor="#333333"];
+end3 [shape=doublecircle label="" width=0.25 style=filled fillcolor="#333333"];
+{rank=same; D; C;}
+{rank=same; Erej; M;}
+{rank=same; Ecan; B;}
+{rank=same; end1; legend;}
+
+start -> R;
+R -> J1 [label="1000"];
+J1 -> C;
+C -> G1 [label="1174"];
+G1 -> M [label="accept · 1129" penwidth=2.5];
+G1 -> Erej [label="reject · 45" color="#c62828" fontcolor="#c62828" constraint=false];
+M -> G2 [label="1129"];
+G2 -> B [label="accept · 911" penwidth=2.5];
+G2 -> D [label="return · 174" color="#1565c0" fontcolor="#1565c0" constraint=false];
+G2 -> Erej [label="reject · 18" color="#c62828" fontcolor="#c62828" constraint=false];
+G2 -> Ecan [label="cancel · 26" color="#ef6c00" fontcolor="#ef6c00" constraint=false];
+D -> J1 [label="возврат · 174\n(1 раз: 138 экз., 2 раза: 18)" color="#1565c0" fontcolor="#1565c0" style=dashed constraint=false];
+B -> G3 [label="911"];
+G3 -> X [label="Amount ≥ 150 000 · 209"];
+G3 -> J3 [label="Amount < 150 000 · 702" penwidth=2.5];
+X -> J3 [label="209"];
+J3 -> P;
+P -> Eok [label="911" penwidth=2.5];
+Eok -> end1; Erej -> end2; Ecan -> end3;
+
+legend [fontsize=9 shape=plaintext label=<<TABLE BORDER="1" COLOR="#999999" CELLBORDER="0" CELLPADDING="3" CELLSPACING="0">
+  <TR><TD COLSPAN="2"><B>Легенда</B></TD></TR>
+  <TR><TD BGCOLOR="#e8f0fe" BORDER="1">задание</TD><TD ALIGN="LEFT">задание (task_completed); под названием — роль</TD></TR>
+  <TR><TD BGCOLOR="#eeeeee" BORDER="1">system</TD><TD ALIGN="LEFT">автоматическое начало / окончание</TD></TR>
+  <TR><TD BGCOLOR="#fff3cd" BORDER="1">◇ X</TD><TD ALIGN="LEFT">выбор одной ветки (XOR); условие на стрелке</TD></TR>
+  <TR><TD>━━</TD><TD ALIGN="LEFT">основной маршрут; число — частота перехода</TD></TR>
+  <TR><TD><FONT COLOR="#1565c0">- - -</FONT></TD><TD ALIGN="LEFT">повторное выполнение (цикл)</TD></TR>
+  <TR><TD>N соб. в M экз.</TD><TD ALIGN="LEFT">повтор активности внутри экземпляра</TD></TR>
+</TABLE>>];
+Eok -> legend [style=invis];
+node [group="main"]; start; R; J1; C; G1; M; G2; B; G3; J3; P; Eok; end1;
+}
